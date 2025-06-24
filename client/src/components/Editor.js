@@ -11,7 +11,7 @@ import 'codemirror/addon/edit/closetag';
 import 'codemirror/addon/edit/closebrackets';
 import toast from 'react-hot-toast';
 import { executeCode } from '../services/codeExecution';
-import ACTIONS from '../Actions';
+import ACTIONS from '../utils/Actions';
 
 const Editor = ({ socketRef, roomId, onCodeChange, onLanguageChange }) => {
   const editorRef = useRef(null);

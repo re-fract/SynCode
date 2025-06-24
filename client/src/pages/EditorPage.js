@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { Helmet } from 'react-helmet-async';
-import ACTIONS from '../Actions';
+import ACTIONS from '../utils/Actions';
 import Client from '../components/Client';
 import Editor from '../components/Editor';
 import { initSocket } from '../socket';
