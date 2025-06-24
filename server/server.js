@@ -7,7 +7,7 @@ const ACTIONS = require('./src/Actions');
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://your-app.vercel.app"],
+    origin: ["http://localhost:3000", "https://syn-code-one.vercel.app/"],
     methods: ["GET", "POST"]
   }
 });
