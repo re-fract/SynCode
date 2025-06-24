@@ -74,12 +74,6 @@ const Home = () => {
             </a>
           </span>
         </div>
-
-        <footer>
-          <h4>
-            Built with ❤️ by <a href="">SynCode</a>
-          </h4>
-        </footer>
       </div>
     </>
   );
