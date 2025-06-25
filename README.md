@@ -18,7 +18,7 @@ You can view the live preview of the project [here](https://syn-code-one.vercel.
 
 ## ⚙️ Installation
 
-### Method 1: Manual Installation
+### Manual Installation
 
 1. **Fork this repository:** Click the Fork button located in the top-right corner of this page.
 2. **Clone the repository:**
