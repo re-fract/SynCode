@@ -8,7 +8,6 @@ A collaborative, real-time code editor where users can seamlessly code together.
 - 🚀 Unique room generation with room ID for collaboration
 - 🌍 Comprehensive language support for versatile programming
 - 🚀 Code Execution: Users can execute the code directly within the collaboration environment
-- ⏱️ Instant updates and synchronization of code changes across all files and folders
 - 📣 Notifications for user join and leave events
 - 👥 User presence list with online/offline status indicators
 
