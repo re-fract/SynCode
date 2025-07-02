@@ -1,36 +1,19 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { Toaster } from 'react-hot-toast';
-import { HelmetProvider } from 'react-helmet-async';
-import './App.css';
-import Home from './pages/Home';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
 import EditorPage from './pages/EditorPage';
+import './App.css';
 
 function App() {
   return (
-    <HelmetProvider>
-      <div>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            success: {
-              duration: 4000,
-              theme: 'dark',
-            },
-            error: {
-              duration: 4000,
-              theme: 'dark',
-            },
-          }}
-        />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/editor/:roomId" element={<EditorPage />} />
-          </Routes>
-        </BrowserRouter>
+    <Router>
+      <div className="App">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/editor/:roomId" element={<EditorPage />} />
+        </Routes>
       </div>
-    </HelmetProvider>
+    </Router>
   );
 }
 
