@@ -175,6 +175,8 @@ const executeCSS = (code) => {
 
 // Server-side code execution
 const executeServerSideCode = async (code, language, userInput = '') => {
+  const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
+  
   try {
     console.log('Making API request to server...');
     console.log('Input being sent:', userInput);
@@ -187,7 +189,6 @@ const executeServerSideCode = async (code, language, userInput = '') => {
     
     console.log('Request data:', requestData);
     
-    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:5000';
     const response = await fetch(`${serverUrl}/api/execute`, {
       method: 'POST',
       headers: {
