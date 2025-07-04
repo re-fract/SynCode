@@ -97,14 +97,6 @@ export default function HomePage() {
             </button>
           </div>
         </div>
-
-        {/* Footer */}
-        <p className="text-center text-slate-500 text-sm mt-8">
-          Powered by SynCode • 
-          <a href="#" className="text-blue-500 hover:text-blue-400 ml-1">
-            Learn More
-          </a>
-        </p>
       </div>
     </div>
   );
