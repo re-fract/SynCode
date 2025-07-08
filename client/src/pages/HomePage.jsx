@@ -52,7 +52,7 @@ export default function HomePage() {
                 type="text"
                 value={roomId}
                 onChange={(e) => setRoomId(e.target.value)}
-                placeholder="Enter room ID"
+                placeholder="Enter Room ID"
                 className="input-field"
                 required
               />
@@ -86,7 +86,7 @@ export default function HomePage() {
           {/* Create New Room Link */}
           <div className="mt-6 text-center">
             <p className="text-slate-400 text-sm mb-2">
-              Don't have a room ID?
+              Don't have a Room ID?
             </p>
             <button 
               onClick={handleCreateRoom}
