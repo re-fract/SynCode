@@ -5,6 +5,15 @@ const { Server } = require('socket.io');
 const cors = require('cors'); // Add this import
 const ACTIONS = require('./src/Actions');
 
+// Enable detailed logging
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
 // Import your code execution service
 const { executeCode } = require('./src/services/codeExecution');
 
@@ -15,7 +24,10 @@ const corsOptions = {
   origin: [
     "http://localhost:3000",
     "http://127.0.0.1:3000", // Add this for local variations
-    "https://syn-code-one.vercel.app"
+    "https://syn-code-one.vercel.app",
+    "https://syncode-p2yq.onrender.com", // Add your Render URL
+    /^https:\/\/.*\.onrender\.com$/, // Allow all render.com subdomains
+    /^https:\/\/.*\.vercel\.app$/ // Allow all vercel.app subdomains
   ],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
@@ -38,11 +50,19 @@ const io = new Server(server, {
     origin: [
       "http://localhost:3000",
       "http://127.0.0.1:3000",
-      "https://syn-code-one.vercel.app"
+      "https://syn-code-one.vercel.app",
+      "https://syncode-p2yq.onrender.com",
+      /^https:\/\/.*\.onrender\.com$/,
+      /^https:\/\/.*\.vercel\.app$/
     ],
     methods: ["GET", "POST"],
     credentials: true
-  }
+  },
+  transports: ['websocket', 'polling'], // Allow both transports for better compatibility
+  pingTimeout: 60000, // Increase ping timeout for slower connections
+  pingInterval: 25000, // Increase ping interval
+  upgradeTimeout: 30000, // Increase upgrade timeout
+  allowEIO3: true // Allow older socket.io versions
 });
 
 // Store users by socketId, not globally
@@ -78,11 +98,20 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-  res.json({ 
+  const healthCheck = {
     status: 'healthy',
     uptime: process.uptime(),
-    timestamp: new Date().toISOString()
-  });
+    timestamp: new Date().toISOString(),
+    memory: {
+      used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + ' MB',
+      total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024) + ' MB'
+    },
+    activeConnections: io.engine.clientsCount || 0,
+    activeRooms: Object.keys(roomLanguages).length,
+    environment: process.env.NODE_ENV || 'development'
+  };
+  
+  res.json(healthCheck);
 });
 
 // ✅ Code execution API route with enhanced error handling
@@ -169,9 +198,18 @@ app.get('/api/languages', (req, res) => {
 // Socket.io connection handling (rest of your existing code)
 io.on('connection', (socket) => {
   console.log('Socket connected:', socket.id);
+  console.log('User agent:', socket.handshake.headers['user-agent']);
+  console.log('Origin:', socket.handshake.headers.origin);
 
   socket.on(ACTIONS.JOIN, ({ roomId, username }) => {
     console.log(`Join attempt: ${username} -> room ${roomId}`);
+    
+    // Validate input
+    if (!roomId || !username) {
+      console.log('Invalid join attempt - missing roomId or username');
+      socket.emit('join_error', { message: 'Room ID and username are required' });
+      return;
+    }
     
     // Check if username is already taken in this room
     if (!isUsernameAvailable(roomId, username)) {
@@ -246,17 +284,37 @@ io.on('connection', (socket) => {
     console.log(`${username} (${socket.id}) disconnected and cleaned up`);
   });
 
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected:', socket.id);
+  socket.on('disconnect', (reason) => {
+    console.log('Socket disconnected:', socket.id, 'Reason:', reason);
+    
+    // Log additional disconnection info
+    if (reason === 'client namespace disconnect') {
+      console.log('Client initiated disconnect');
+    } else if (reason === 'server namespace disconnect') {
+      console.log('Server initiated disconnect');
+    } else if (reason === 'transport close') {
+      console.log('Transport connection closed');
+    } else if (reason === 'transport error') {
+      console.log('Transport error occurred');
+    }
+  });
+
+  socket.on('error', (error) => {
+    console.error('Socket error:', error);
+  });
+
+  socket.on('connect_error', (error) => {
+    console.error('Socket connect error:', error);
   });
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`✅ SynCode Server running on port ${PORT}`);
-  console.log(`✅ CORS enabled for: http://localhost:3000, https://syn-code-one.vercel.app`);
+  console.log(`✅ CORS enabled for: localhost:3000, syn-code-one.vercel.app, syncode-p2yq.onrender.com`);
   console.log(`✅ API routes available:`);
   console.log(`   - GET  /health`);
   console.log(`   - POST /api/execute`);
   console.log(`   - GET  /api/languages`);
+  console.log(`✅ Socket.io configured with websocket and polling transports`);
 });
